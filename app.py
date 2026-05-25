@@ -1,6 +1,4 @@
 import json
-from pathlib import Path
-
 import joblib
 import numpy as np
 import pandas as pd
@@ -189,32 +187,22 @@ footer {visibility: hidden;}
 
 
 # =========================================================
-# FILE PATHS
-# =========================================================
-MODEL_PATH = Path("best_bnpl_model.pkl")
-FEATURE_PATH = Path("feature_columns.json")
-DATA_PATH = Path("BNPL_dataset.csv")
-
-
-# =========================================================
 # LOAD FILES
 # =========================================================
 @st.cache_resource
 def load_model():
-    return joblib.load(MODEL_PATH)
+    return joblib.load("best_bnpl_model.pkl")
 
 
 @st.cache_data
 def load_features():
-    with open(FEATURE_PATH, "r", encoding="utf-8") as f:
+    with open("feature_columns.json", "r", encoding="utf-8") as f:
         return json.load(f)
 
 
 @st.cache_data
 def load_data():
-    if DATA_PATH.exists():
-        return pd.read_csv(DATA_PATH)
-    return None
+    return pd.read_csv("BNPL_dataset.csv")
 
 
 try:
@@ -225,7 +213,10 @@ except Exception as e:
     st.exception(e)
     st.stop()
 
-df = load_data()
+try:
+    df = load_data()
+except Exception:
+    df = None
 
 
 # =========================================================
@@ -233,8 +224,7 @@ df = load_data()
 # =========================================================
 def clean_feature_name(name):
     return (
-        str(name)
-        .replace("_", " ")
+        name.replace("_", " ")
         .replace("bnpl", "BNPL")
         .replace("usa", "USA")
         .replace("uk", "UK")
@@ -244,20 +234,17 @@ def clean_feature_name(name):
 
 def get_base_model(model):
     if hasattr(model, "named_steps"):
-        return list(model.named_steps.values())[-1]
+        return model.named_steps.get("model", model)
     return model
 
 
 def get_model_importance(model, feature_columns):
-
     base_model = get_base_model(model)
 
     if hasattr(base_model, "feature_importances_"):
         values = base_model.feature_importances_
-
     elif hasattr(base_model, "coef_"):
         values = np.abs(base_model.coef_[0])
-
     else:
         values = np.ones(len(feature_columns))
 
@@ -267,30 +254,16 @@ def get_model_importance(model, feature_columns):
         "Importance": values
     })
 
-    return importance_df.sort_values(
-        "Importance",
-        ascending=False
-    )
+    return importance_df.sort_values("Importance", ascending=False)
 
 
-def style_chart(
-    fig,
-    height=420,
-    left_margin=130,
-    bottom_margin=100
-):
-
+def style_chart(fig, height=420, left_margin=130, bottom_margin=100):
     fig.update_layout(
         height=height,
         paper_bgcolor="white",
         plot_bgcolor="white",
         font=dict(color="#061A33", size=13),
-        margin=dict(
-            l=left_margin,
-            r=40,
-            t=70,
-            b=bottom_margin
-        ),
+        margin=dict(l=left_margin, r=40, t=70, b=bottom_margin),
         legend=dict(font=dict(color="#061A33"))
     )
 
@@ -310,52 +283,29 @@ def style_chart(
 
 
 def predict_probability(model, input_data):
-
     if hasattr(model, "predict_proba"):
-        probability = model.predict_proba(input_data)[0][1]
-    else:
-        probability = float(model.predict(input_data)[0])
-
-    return probability
+        return model.predict_proba(input_data)[0][1]
+    return float(model.predict(input_data)[0])
 
 
 def create_gauge(probability):
-
-    fig = go.Figure(
-        go.Indicator(
-            mode="gauge+number",
-            value=probability * 100,
-            number={
-                "suffix": "%",
-                "font": {
-                    "size": 30,
-                    "color": "#061A33"
-                }
-            },
-            gauge={
-                "axis": {
-                    "range": [0, 100]
-                },
-                "bar": {
-                    "color": "#005BFF"
-                },
-                "steps": [
-                    {
-                        "range": [0, 30],
-                        "color": "#DDF8E8"
-                    },
-                    {
-                        "range": [30, 60],
-                        "color": "#FFF4CC"
-                    },
-                    {
-                        "range": [60, 100],
-                        "color": "#FFE1E1"
-                    }
-                ],
-            }
-        )
-    )
+    fig = go.Figure(go.Indicator(
+        mode="gauge+number",
+        value=probability * 100,
+        number={
+            "suffix": "%",
+            "font": {"size": 30, "color": "#061A33"}
+        },
+        gauge={
+            "axis": {"range": [0, 100]},
+            "bar": {"color": "#005BFF"},
+            "steps": [
+                {"range": [0, 30], "color": "#DDF8E8"},
+                {"range": [30, 60], "color": "#FFF4CC"},
+                {"range": [60, 100], "color": "#FFE1E1"}
+            ],
+        }
+    ))
 
     fig.update_layout(
         height=300,
@@ -371,7 +321,6 @@ def create_gauge(probability):
 # SIDEBAR
 # =========================================================
 with st.sidebar:
-
     st.markdown("## 💳 BNPL RISK")
     st.markdown("---")
 
@@ -386,15 +335,11 @@ with st.sidebar:
     )
 
     st.markdown("---")
-
     st.markdown("### Model Information")
-
     st.write("Model Type")
     st.write(type(get_base_model(model)).__name__)
-
     st.write("Dataset")
     st.write("BNPL Dataset")
-
     st.write("Version")
     st.write("1.0")
 
@@ -403,20 +348,12 @@ with st.sidebar:
 # HEADER
 # =========================================================
 st.markdown(
-    """
-    <div class="main-title">
-        BNPL Credit Risk Prediction Dashboard
-    </div>
-    """,
+    '<div class="main-title">BNPL Credit Risk Prediction Dashboard</div>',
     unsafe_allow_html=True
 )
 
 st.markdown(
-    """
-    <div class="subtitle">
-        Predict customer default risk using machine learning and explainable AI.
-    </div>
-    """,
+    '<div class="subtitle">Predict customer default risk using machine learning and explainable AI.</div>',
     unsafe_allow_html=True
 )
 
@@ -425,7 +362,6 @@ st.markdown(
 # KPI SECTION
 # =========================================================
 if df is not None and page in ["Dashboard", "Analytics"]:
-
     total_customers = len(df)
     default_rate = df["default_flag"].mean() * 100
     avg_credit = df["credit_score"].mean()
@@ -442,11 +378,7 @@ if df is not None and page in ["Dashboard", "Analytics"]:
         ("🚨 High Risk Customers", f"{high_risk:,}")
     ]
 
-    for col, (label, value) in zip(
-        [k1, k2, k3, k4, k5],
-        kpis
-    ):
-
+    for col, (label, value) in zip([k1, k2, k3, k4, k5], kpis):
         with col:
             st.markdown(
                 f"""
@@ -466,124 +398,53 @@ if df is not None and page in ["Dashboard", "Analytics"]:
 # =========================================================
 if page in ["Dashboard", "Prediction", "Explainable AI"]:
 
-    st.markdown(
-        '<div class="section-title">Predict Credit Risk</div>',
-        unsafe_allow_html=True
-    )
+    st.markdown('<div class="section-title">Predict Credit Risk</div>', unsafe_allow_html=True)
 
     left, middle, right = st.columns([2.1, 1.1, 1.1])
 
     with left:
-
         c1, c2, c3 = st.columns(3)
 
         with c1:
             age = st.number_input("Age", 18, 80, 30)
-
             employment_type = st.selectbox(
                 "Employment Type",
-                [
-                    "Employed",
-                    "Self-Employed",
-                    "Student",
-                    "Unemployed"
-                ]
+                ["Employed", "Self-Employed", "Student", "Unemployed"]
             )
-
-            purchase_amount = st.number_input(
-                "Purchase Amount",
-                value=500.0
-            )
-
-            missed_payments = st.number_input(
-                "Missed Payments",
-                value=0
-            )
-
+            purchase_amount = st.number_input("Purchase Amount", value=500.0)
+            missed_payments = st.number_input("Missed Payments", value=0)
             location = st.selectbox(
                 "Location",
-                [
-                    "Australia",
-                    "Canada",
-                    "Germany",
-                    "India",
-                    "UK",
-                    "USA"
-                ]
+                ["Australia", "Canada", "Germany", "India", "UK", "USA"]
             )
 
         with c2:
-
-            monthly_income = st.number_input(
-                "Monthly Income",
-                value=5000.0
-            )
-
-            debt_to_income_ratio = st.number_input(
-                "Debt to Income Ratio",
-                value=0.30
-            )
-
+            monthly_income = st.number_input("Monthly Income", value=5000.0)
+            debt_to_income_ratio = st.number_input("Debt to Income Ratio", value=0.30)
             bnpl_installments = st.selectbox(
                 "BNPL Installments",
                 [1, 2, 3, 4, 6, 8, 10, 12],
                 index=3
             )
-
-            risk_score = st.slider(
-                "Risk Score",
-                0.0,
-                1.0,
-                0.50
-            )
-
+            risk_score = st.slider("Risk Score", 0.0, 1.0, 0.50)
             customer_segment = st.selectbox(
                 "Customer Segment",
-                [
-                    "High Risk",
-                    "Low Risk",
-                    "Medium Risk"
-                ]
+                ["High Risk", "Low Risk", "Medium Risk"]
             )
 
         with c3:
-
-            credit_score = st.number_input(
-                "Credit Score",
-                300,
-                850,
-                650
-            )
-
-            app_usage_frequency = st.number_input(
-                "App Usage Frequency",
-                value=10.0
-            )
-
-            repayment_delay_days = st.number_input(
-                "Repayment Delay Days",
-                value=0
-            )
-
+            credit_score = st.number_input("Credit Score", 300, 850, 650)
+            app_usage_frequency = st.number_input("App Usage Frequency", value=10.0)
+            repayment_delay_days = st.number_input("Repayment Delay Days", value=0)
             product_category = st.selectbox(
                 "Product Category",
-                [
-                    "Beauty",
-                    "Electronics",
-                    "Fashion",
-                    "Home",
-                    "Sports"
-                ]
+                ["Beauty", "Electronics", "Fashion", "Home", "Sports"]
             )
-
-            transaction_date = st.date_input(
-                "Transaction Date"
-            )
+            transaction_date = st.date_input("Transaction Date")
 
         predict_button = st.button("Predict Risk")
 
     input_data = pd.DataFrame({
-
         "age": [age],
         "monthly_income": [monthly_income],
         "credit_score": [credit_score],
@@ -594,173 +455,79 @@ if page in ["Dashboard", "Prediction", "Explainable AI"]:
         "app_usage_frequency": [app_usage_frequency],
         "debt_to_income_ratio": [debt_to_income_ratio],
         "risk_score": [risk_score],
-
         "transaction_month": [transaction_date.month],
         "transaction_year": [transaction_date.year],
         "transaction_day": [transaction_date.day],
-
-        "employment_type_Self-Employed": [
-            1 if employment_type == "Self-Employed" else 0
-        ],
-
-        "employment_type_Student": [
-            1 if employment_type == "Student" else 0
-        ],
-
-        "employment_type_Unemployed": [
-            1 if employment_type == "Unemployed" else 0
-        ],
-
-        "product_category_Electronics": [
-            1 if product_category == "Electronics" else 0
-        ],
-
-        "product_category_Fashion": [
-            1 if product_category == "Fashion" else 0
-        ],
-
-        "product_category_Home": [
-            1 if product_category == "Home" else 0
-        ],
-
-        "product_category_Sports": [
-            1 if product_category == "Sports" else 0
-        ],
-
-        "location_Canada": [
-            1 if location == "Canada" else 0
-        ],
-
-        "location_Germany": [
-            1 if location == "Germany" else 0
-        ],
-
-        "location_India": [
-            1 if location == "India" else 0
-        ],
-
-        "location_UK": [
-            1 if location == "UK" else 0
-        ],
-
-        "location_USA": [
-            1 if location == "USA" else 0
-        ],
-
-        "customer_segment_Low Risk": [
-            1 if customer_segment == "Low Risk" else 0
-        ],
-
-        "customer_segment_Medium Risk": [
-            1 if customer_segment == "Medium Risk" else 0
-        ],
+        "employment_type_Self-Employed": [1 if employment_type == "Self-Employed" else 0],
+        "employment_type_Student": [1 if employment_type == "Student" else 0],
+        "employment_type_Unemployed": [1 if employment_type == "Unemployed" else 0],
+        "product_category_Electronics": [1 if product_category == "Electronics" else 0],
+        "product_category_Fashion": [1 if product_category == "Fashion" else 0],
+        "product_category_Home": [1 if product_category == "Home" else 0],
+        "product_category_Sports": [1 if product_category == "Sports" else 0],
+        "location_Canada": [1 if location == "Canada" else 0],
+        "location_Germany": [1 if location == "Germany" else 0],
+        "location_India": [1 if location == "India" else 0],
+        "location_UK": [1 if location == "UK" else 0],
+        "location_USA": [1 if location == "USA" else 0],
+        "customer_segment_Low Risk": [1 if customer_segment == "Low Risk" else 0],
+        "customer_segment_Medium Risk": [1 if customer_segment == "Medium Risk" else 0],
     })
 
     for col in feature_columns:
-
         if col not in input_data.columns:
             input_data[col] = 0
 
     input_data = input_data[feature_columns]
 
-    probability = predict_probability(
-        model,
-        input_data
-    )
+    probability = predict_probability(model, input_data)
 
     if probability < 0.30:
-
         risk_label = "Low Risk"
         risk_class = "risk-low"
-
-        recommendation = (
-            "Customer is likely safe for BNPL approval."
-        )
-
+        recommendation = "Customer is likely safe for BNPL approval."
     elif probability < 0.60:
-
         risk_label = "Medium Risk"
         risk_class = "risk-medium"
-
-        recommendation = (
-            "Customer requires additional review before approval."
-        )
-
+        recommendation = "Customer requires additional review before approval."
     else:
-
         risk_label = "High Risk"
         risk_class = "risk-high"
-
-        recommendation = (
-            "Customer has high default risk. "
-            "Consider rejecting or lowering credit limit."
-        )
+        recommendation = "Customer has high default risk. Consider rejecting or lowering credit limit."
 
     with middle:
-
-        st.markdown(
-            '<div class="section-title">Prediction Result</div>',
-            unsafe_allow_html=True
-        )
+        st.markdown('<div class="section-title">Prediction Result</div>', unsafe_allow_html=True)
 
         st.markdown(
             f"""
             <div class="result-card">
-
                 <p><b>Default Probability</b></p>
-
-                <h1 style="
-                    text-align:center;
-                    color:#005BFF;
-                    font-size:48px;
-                ">
-                    {probability * 100:.2f}%
-                </h1>
-
+                <h1 style="text-align:center; color:#005BFF; font-size:48px;">{probability * 100:.2f}%</h1>
                 <p><b>Risk Level</b></p>
-
-                <div class="{risk_class}">
-                    {risk_label}
-                </div>
-
+                <div class="{risk_class}">{risk_label}</div>
                 <br>
-
                 <p><b>Recommendation</b></p>
-
-                <div class="recommend-box">
-                    {recommendation}
-                </div>
-
+                <div class="recommend-box">{recommendation}</div>
             </div>
             """,
             unsafe_allow_html=True
         )
 
     with right:
-
-        st.markdown(
-            '<div class="section-title">Default Probability</div>',
-            unsafe_allow_html=True
-        )
-
-        st.plotly_chart(
-            create_gauge(probability),
-            use_container_width=True
-        )
+        st.markdown('<div class="section-title">Default Probability</div>', unsafe_allow_html=True)
+        st.plotly_chart(create_gauge(probability), use_container_width=True)
 
 
 # =========================================================
 # ANALYTICS PAGE
 # =========================================================
 if df is not None and page in ["Dashboard", "Analytics"]:
-
     st.markdown("---")
     st.markdown("### Data Insights")
 
     d1, d2 = st.columns(2)
 
     with d1:
-
         fig_credit = px.histogram(
             df,
             x="credit_score",
@@ -768,28 +535,13 @@ if df is not None and page in ["Dashboard", "Analytics"]:
             title="Credit Score Distribution by Default Status"
         )
 
-        fig_credit = style_chart(
-            fig_credit,
-            height=430,
-            left_margin=90,
-            bottom_margin=110
-        )
+        fig_credit = style_chart(fig_credit, height=430, left_margin=90, bottom_margin=110)
+        fig_credit.update_xaxes(title_text="Credit Score")
+        fig_credit.update_yaxes(title_text="Count")
 
-        fig_credit.update_xaxes(
-            title_text="Credit Score"
-        )
-
-        fig_credit.update_yaxes(
-            title_text="Count"
-        )
-
-        st.plotly_chart(
-            fig_credit,
-            use_container_width=True
-        )
+        st.plotly_chart(fig_credit, use_container_width=True)
 
     with d2:
-
         fig_delay = px.box(
             df,
             x="default_flag",
@@ -797,47 +549,25 @@ if df is not None and page in ["Dashboard", "Analytics"]:
             title="Repayment Delay by Default Status"
         )
 
-        fig_delay = style_chart(
-            fig_delay,
-            height=430,
-            left_margin=100,
-            bottom_margin=110
-        )
+        fig_delay = style_chart(fig_delay, height=430, left_margin=100, bottom_margin=110)
+        fig_delay.update_xaxes(title_text="Default Flag")
+        fig_delay.update_yaxes(title_text="Repayment Delay Days")
 
-        fig_delay.update_xaxes(
-            title_text="Default Flag"
-        )
-
-        fig_delay.update_yaxes(
-            title_text="Repayment Delay Days"
-        )
-
-        st.plotly_chart(
-            fig_delay,
-            use_container_width=True
-        )
+        st.plotly_chart(fig_delay, use_container_width=True)
 
 
 # =========================================================
 # EXPLAINABLE AI PAGE
 # =========================================================
 if page in ["Dashboard", "Explainable AI"]:
-
     st.markdown("---")
     st.markdown("### Explainable AI")
 
-    importance_df = get_model_importance(
-        model,
-        feature_columns
-    ).head(10)
+    importance_df = get_model_importance(model, feature_columns).head(10)
 
     g1, g2 = st.columns(2)
 
-    # =====================================================
-    # GLOBAL FEATURE IMPORTANCE
-    # =====================================================
     with g1:
-
         st.markdown("#### Global Feature Importance")
 
         fig_imp = px.bar(
@@ -849,38 +579,17 @@ if page in ["Dashboard", "Explainable AI"]:
             title="Top Drivers of Model Prediction"
         )
 
-        fig_imp = style_chart(
-            fig_imp,
-            height=470,
-            left_margin=170,
-            bottom_margin=110
-        )
+        fig_imp = style_chart(fig_imp, height=470, left_margin=170, bottom_margin=110)
+        fig_imp.update_xaxes(title_text="Importance")
+        fig_imp.update_yaxes(title_text="")
 
-        fig_imp.update_xaxes(
-            title_text="Importance Score"
-        )
+        st.plotly_chart(fig_imp, use_container_width=True)
 
-        fig_imp.update_yaxes(
-            title_text=""
-        )
-
-        st.plotly_chart(
-            fig_imp,
-            use_container_width=True
-        )
-
-    # =====================================================
-    # SHAP STYLE EXPLANATION
-    # =====================================================
     with g2:
-
         st.markdown("#### SHAP-Style Impact Explanation")
 
         shap_df = importance_df.head(8).copy()
-
-        shap_df["Impact"] = (
-            shap_df["Importance"] * probability
-        )
+        shap_df["Impact"] = shap_df["Importance"] * probability
 
         lower_risk_features = [
             "credit_score",
@@ -920,76 +629,25 @@ if page in ["Dashboard", "Explainable AI"]:
             line_color="#061A33"
         )
 
-        fig_shap = style_chart(
-            fig_shap,
-            height=470,
-            left_margin=170,
-            bottom_margin=110
-        )
+        fig_shap = style_chart(fig_shap, height=470, left_margin=170, bottom_margin=110)
+        fig_shap.update_xaxes(title_text="Impact on Default Probability")
+        fig_shap.update_yaxes(title_text="")
 
-        fig_shap.update_xaxes(
-            title_text="Impact on Default Probability"
-        )
+        st.plotly_chart(fig_shap, use_container_width=True)
 
-        fig_shap.update_yaxes(
-            title_text=""
-        )
-
-        st.plotly_chart(
-            fig_shap,
-            use_container_width=True
-        )
-
-    # =====================================================
-    # EXPLANATION + CREATED BY
-    # =====================================================
     st.markdown(
         """
         <div style="
             background:#EAF2FF;
             border:1px solid #BBD3FF;
             border-radius:12px;
-            padding:20px;
+            padding:16px;
             margin-top:15px;
             color:#123B73;
             font-size:14px;
-            text-align:center;
         ">
-
-            <div style="
-                margin-bottom:14px;
-                line-height:1.7;
-            ">
-                <b>Explanation:</b><br>
-
-                Global Feature Importance shows which variables
-                are most influential overall.
-
-                The SHAP-style chart shows whether the selected
-                customer profile is pushed toward higher or
-                lower default risk.
-            </div>
-
-            <div style="
-                border-top:1px solid #BBD3FF;
-                padding-top:14px;
-                color:#061A33;
-            ">
-
-                Developed & Designed By
-
-                <br><br>
-
-                <span style="
-                    font-size:24px;
-                    font-weight:800;
-                    color:#005BFF;
-                ">
-                    Agnes Jeni Makay
-                </span>
-
-            </div>
-
+        <b>Explanation:</b> Global Feature Importance shows which variables are most influential overall.
+        The SHAP-style chart shows whether the selected customer profile is pushed toward higher or lower default risk.
         </div>
         """,
         unsafe_allow_html=True
@@ -1010,11 +668,8 @@ st.markdown(
         color:#5C4A00;
         font-size:14px;
     ">
-        This dashboard uses machine learning to predict BNPL
-        default risk.
-
-        Model explanations are used to support decision-making,
-        not as the only decision factor.
+    This dashboard uses machine learning to predict BNPL default risk.
+    Model explanations are used to support decision-making, not as the only decision factor.
     </div>
     """,
     unsafe_allow_html=True
