@@ -647,6 +647,7 @@ if page in ["Dashboard", "Explainable AI"]:
         font-size:14px;
         text-align:center;
     ">
+
         <div style="
             margin-bottom:14px;
             line-height:1.7;
@@ -669,11 +670,12 @@ if page in ["Dashboard", "Explainable AI"]:
             ">
                 Agnes Jeni Makay
             </span>
+
         </div>
+
     </div>
     """,
-    unsafe_allow_html=True
-    )
+    unsafe_allow_html=True)
 # =========================================================
 # FOOTER
 # =========================================================
