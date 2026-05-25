@@ -6,6 +6,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
 
+
 st.set_page_config(
     page_title="BNPL Credit Risk Dashboard",
     page_icon="💳",
@@ -16,7 +17,7 @@ st.markdown("""
 <style>
 .stApp {
     background: #F4F7FB;
-    color: #0B1F3A;
+    color: #061A33;
 }
 
 .block-container {
@@ -35,12 +36,16 @@ st.markdown("""
     color: white !important;
 }
 
-.sidebar-box {
+div[role="radiogroup"] label {
     background: rgba(255,255,255,0.08);
     padding: 12px 14px;
     border-radius: 12px;
     margin-bottom: 8px;
     font-weight: 600;
+}
+
+div[role="radiogroup"] label:hover {
+    background: rgba(255,255,255,0.18);
 }
 
 /* Text */
@@ -64,7 +69,7 @@ st.markdown("""
     margin-bottom: 10px;
 }
 
-/* Cards */
+/* KPI */
 .kpi-card {
     background: white;
     border: 1px solid #E0E8F3;
@@ -85,6 +90,7 @@ st.markdown("""
     color: #061A33;
 }
 
+/* Cards */
 .result-card {
     background: white;
     border: 1px solid #E0E8F3;
@@ -131,7 +137,7 @@ st.markdown("""
     font-size: 14px;
 }
 
-/* Input */
+/* Inputs */
 label {
     color: #071D49 !important;
     font-weight: 600 !important;
@@ -157,7 +163,6 @@ div[data-baseweb="select"] > div {
     font-weight: 700;
 }
 
-/* Hide Streamlit default menu/footer */
 #MainMenu {visibility: hidden;}
 footer {visibility: hidden;}
 </style>
@@ -180,6 +185,64 @@ def load_data():
     return pd.read_csv("BNPL_dataset.csv")
 
 
+def clean_feature_name(name):
+    return (
+        name.replace("_", " ")
+        .replace("bnpl", "BNPL")
+        .replace("dti", "DTI")
+        .title()
+    )
+
+
+def get_model_importance(model, feature_columns):
+    if hasattr(model, "feature_importances_"):
+        values = model.feature_importances_
+    elif hasattr(model, "named_steps"):
+        final_model = model.named_steps.get("model")
+        if hasattr(final_model, "feature_importances_"):
+            values = final_model.feature_importances_
+        elif hasattr(final_model, "coef_"):
+            values = np.abs(final_model.coef_[0])
+        else:
+            values = np.ones(len(feature_columns))
+    elif hasattr(model, "coef_"):
+        values = np.abs(model.coef_[0])
+    else:
+        values = np.ones(len(feature_columns))
+
+    importance_df = pd.DataFrame({
+        "Feature": feature_columns,
+        "Feature Name": [clean_feature_name(x) for x in feature_columns],
+        "Importance": values
+    })
+
+    return importance_df.sort_values("Importance", ascending=False)
+
+
+def style_chart(fig, height=420, left_margin=120, bottom_margin=90):
+    fig.update_layout(
+        height=height,
+        paper_bgcolor="white",
+        plot_bgcolor="white",
+        font=dict(color="#061A33", size=13),
+        margin=dict(l=left_margin, r=40, t=60, b=bottom_margin),
+        xaxis=dict(
+            tickfont=dict(color="#061A33", size=12),
+            titlefont=dict(color="#061A33", size=13),
+            automargin=True
+        ),
+        yaxis=dict(
+            tickfont=dict(color="#061A33", size=12),
+            titlefont=dict(color="#061A33", size=13),
+            automargin=True
+        ),
+        legend=dict(
+            font=dict(color="#061A33")
+        )
+    )
+    return fig
+
+
 try:
     model = load_model()
     feature_columns = load_features()
@@ -197,17 +260,20 @@ except Exception:
 with st.sidebar:
     st.markdown("## 💳 BNPL RISK")
     st.markdown("---")
-    st.markdown("### Dashboard")
-    st.markdown('<div class="sidebar-box">📊 Dashboard</div>', unsafe_allow_html=True)
-    st.markdown("### Prediction")
-    st.markdown('<div class="sidebar-box">💳 Predict Credit Risk</div>', unsafe_allow_html=True)
-    st.markdown('<div class="sidebar-box">📂 Batch Prediction</div>', unsafe_allow_html=True)
-    st.markdown("### Analytics")
-    st.markdown('<div class="sidebar-box">📈 Portfolio Overview</div>', unsafe_allow_html=True)
-    st.markdown('<div class="sidebar-box">📉 Data Insights</div>', unsafe_allow_html=True)
-    st.markdown("### Explainable AI")
-    st.markdown('<div class="sidebar-box">🧠 Model Explainability</div>', unsafe_allow_html=True)
-    st.markdown('<div class="sidebar-box">🔍 SHAP Analysis</div>', unsafe_allow_html=True)
+
+    page = st.radio(
+        "Navigation",
+        [
+            "Dashboard",
+            "Predict Credit Risk",
+            "Portfolio Overview",
+            "Data Insights",
+            "Model Explainability",
+            "SHAP Analysis",
+        ],
+        label_visibility="collapsed"
+    )
+
     st.markdown("---")
     st.markdown("### Model Information")
     st.write("Model Type")
@@ -216,8 +282,14 @@ with st.sidebar:
     st.write("BNPL Dataset")
 
 
-st.markdown('<div class="main-title">BNPL Credit Risk Prediction Dashboard</div>', unsafe_allow_html=True)
-st.markdown('<div class="subtitle">Predict customer default risk using machine learning</div>', unsafe_allow_html=True)
+st.markdown(
+    '<div class="main-title">BNPL Credit Risk Prediction Dashboard</div>',
+    unsafe_allow_html=True
+)
+st.markdown(
+    '<div class="subtitle">Predict customer default risk using machine learning</div>',
+    unsafe_allow_html=True
+)
 
 
 if df is not None:
@@ -249,7 +321,13 @@ if df is not None:
                 unsafe_allow_html=True
             )
 
-st.markdown("### Predict Credit Risk")
+st.markdown("<br>", unsafe_allow_html=True)
+
+
+# ==============================
+# INPUT SECTION
+# ==============================
+st.markdown('<div class="section-title">Predict Credit Risk</div>', unsafe_allow_html=True)
 
 left, middle, right = st.columns([2.1, 1.1, 1.1])
 
@@ -258,23 +336,39 @@ with left:
 
     with c1:
         age = st.number_input("Age", 18, 80, 30)
-        employment_type = st.selectbox("Employment Type", ["Employed", "Self-Employed", "Student", "Unemployed"])
+        employment_type = st.selectbox(
+            "Employment Type",
+            ["Employed", "Self-Employed", "Student", "Unemployed"]
+        )
         purchase_amount = st.number_input("Purchase Amount", value=500.0)
         missed_payments = st.number_input("Missed Payments", value=0)
-        location = st.selectbox("Location", ["Australia", "Canada", "Germany", "India", "UK", "USA"])
+        location = st.selectbox(
+            "Location",
+            ["Australia", "Canada", "Germany", "India", "UK", "USA"]
+        )
 
     with c2:
         monthly_income = st.number_input("Monthly Income", value=5000.0)
         debt_to_income_ratio = st.number_input("Debt to Income Ratio", value=0.30)
-        bnpl_installments = st.selectbox("BNPL Installments", [1, 2, 3, 4, 6, 8, 10, 12], index=3)
+        bnpl_installments = st.selectbox(
+            "BNPL Installments",
+            [1, 2, 3, 4, 6, 8, 10, 12],
+            index=3
+        )
         risk_score = st.slider("Risk Score", 0.0, 1.0, 0.50)
-        customer_segment = st.selectbox("Customer Segment", ["High Risk", "Low Risk", "Medium Risk"])
+        customer_segment = st.selectbox(
+            "Customer Segment",
+            ["High Risk", "Low Risk", "Medium Risk"]
+        )
 
     with c3:
         credit_score = st.number_input("Credit Score", 300, 850, 650)
         app_usage_frequency = st.number_input("App Usage Frequency", value=10.0)
         repayment_delay_days = st.number_input("Repayment Delay Days", value=0)
-        product_category = st.selectbox("Product Category", ["Beauty", "Electronics", "Fashion", "Home", "Sports"])
+        product_category = st.selectbox(
+            "Product Category",
+            ["Beauty", "Electronics", "Fashion", "Home", "Sports"]
+        )
         transaction_date = st.date_input("Transaction Date")
 
     predict_button = st.button("Predict Risk")
@@ -371,80 +465,67 @@ with right:
     ))
 
     gauge.update_layout(
-        height=280,
+        height=300,
         paper_bgcolor="white",
         font=dict(color="#061A33"),
-        margin=dict(l=20, r=20, t=20, b=20)
+        margin=dict(l=40, r=40, t=40, b=40)
     )
 
     st.plotly_chart(gauge, use_container_width=True)
 
 
-if hasattr(model, "feature_importances_"):
-    importance_values = model.feature_importances_
-else:
-    importance_values = np.ones(len(feature_columns))
+# ==============================
+# MODEL EXPLANATION
+# ==============================
+if page in ["Dashboard", "Model Explainability", "SHAP Analysis"]:
+    st.markdown("---")
 
-importance_df = pd.DataFrame({
-    "Feature": feature_columns,
-    "Importance": importance_values
-}).sort_values("Importance", ascending=False).head(10)
+    importance_df = get_model_importance(model, feature_columns).head(10)
 
-st.markdown("---")
+    g1, g2 = st.columns(2)
 
-g1, g2 = st.columns(2)
+    with g1:
+        st.markdown("### Feature Importance")
 
-with g1:
-    st.markdown("### Feature Importance")
+        fig_imp = px.bar(
+            importance_df.sort_values("Importance"),
+            x="Importance",
+            y="Feature Name",
+            orientation="h",
+            color_discrete_sequence=["#005BFF"]
+        )
 
-    fig_imp = px.bar(
-        importance_df.sort_values("Importance"),
-        x="Importance",
-        y="Feature",
-        orientation="h",
-        color_discrete_sequence=["#005BFF"]
-    )
+        fig_imp = style_chart(fig_imp, height=460, left_margin=160, bottom_margin=100)
+        fig_imp.update_xaxes(title_text="Importance")
+        fig_imp.update_yaxes(title_text="")
 
-    fig_imp.update_layout(
-        height=420,
-        paper_bgcolor="white",
-        plot_bgcolor="white",
-        font=dict(color="#061A33", size=13),
-        margin=dict(l=20, r=20, t=30, b=30),
-        xaxis=dict(title="Importance", tickfont=dict(color="#061A33")),
-        yaxis=dict(title="", tickfont=dict(color="#061A33"))
-    )
+        st.plotly_chart(fig_imp, use_container_width=True)
 
-    st.plotly_chart(fig_imp, use_container_width=True)
+    with g2:
+        st.markdown("### Local Explanation")
 
-with g2:
-    st.markdown("### Local Explanation")
+        local_df = importance_df.head(5).copy()
+        local_df["Estimated Contribution"] = local_df["Importance"] * probability
 
-    local_df = importance_df.head(5).copy()
-    local_df["Contribution"] = local_df["Importance"] * probability
+        fig_local = px.bar(
+            local_df.sort_values("Estimated Contribution"),
+            x="Estimated Contribution",
+            y="Feature Name",
+            orientation="h",
+            color_discrete_sequence=["#FF5A5F"]
+        )
 
-    fig_local = px.bar(
-        local_df.sort_values("Contribution"),
-        x="Contribution",
-        y="Feature",
-        orientation="h",
-        color_discrete_sequence=["#FF5A5F"]
-    )
+        fig_local = style_chart(fig_local, height=460, left_margin=160, bottom_margin=100)
+        fig_local.update_xaxes(title_text="Estimated Contribution")
+        fig_local.update_yaxes(title_text="")
 
-    fig_local.update_layout(
-        height=420,
-        paper_bgcolor="white",
-        plot_bgcolor="white",
-        font=dict(color="#061A33", size=13),
-        margin=dict(l=20, r=20, t=30, b=30),
-        xaxis=dict(title="Estimated Contribution", tickfont=dict(color="#061A33")),
-        yaxis=dict(title="", tickfont=dict(color="#061A33"))
-    )
-
-    st.plotly_chart(fig_local, use_container_width=True)
+        st.plotly_chart(fig_local, use_container_width=True)
 
 
-if df is not None:
+# ==============================
+# DATA INSIGHTS
+# ==============================
+if df is not None and page in ["Dashboard", "Portfolio Overview", "Data Insights"]:
     st.markdown("---")
     st.markdown("### Data Insights")
 
@@ -458,14 +539,9 @@ if df is not None:
             title="Credit Score Distribution by Default Status"
         )
 
-        fig_credit.update_layout(
-            height=380,
-            paper_bgcolor="white",
-            plot_bgcolor="white",
-            font=dict(color="#061A33"),
-            xaxis=dict(title="Credit Score", tickfont=dict(color="#061A33")),
-            yaxis=dict(title="Count", tickfont=dict(color="#061A33"))
-        )
+        fig_credit = style_chart(fig_credit, height=430, left_margin=90, bottom_margin=110)
+        fig_credit.update_xaxes(title_text="Credit Score")
+        fig_credit.update_yaxes(title_text="Count")
 
         st.plotly_chart(fig_credit, use_container_width=True)
 
@@ -477,14 +553,9 @@ if df is not None:
             title="Repayment Delay by Default Status"
         )
 
-        fig_delay.update_layout(
-            height=380,
-            paper_bgcolor="white",
-            plot_bgcolor="white",
-            font=dict(color="#061A33"),
-            xaxis=dict(title="Default Flag", tickfont=dict(color="#061A33")),
-            yaxis=dict(title="Repayment Delay Days", tickfont=dict(color="#061A33"))
-        )
+        fig_delay = style_chart(fig_delay, height=430, left_margin=100, bottom_margin=110)
+        fig_delay.update_xaxes(title_text="Default Flag")
+        fig_delay.update_yaxes(title_text="Repayment Delay Days")
 
         st.plotly_chart(fig_delay, use_container_width=True)
 
@@ -500,7 +571,7 @@ st.markdown(
         color:#5C4A00;
         font-size:14px;
     ">
-    This dashboard uses machine learning to predict BNPL default risk. 
+    This dashboard uses machine learning to predict BNPL default risk.
     Model explanations are used to support decision-making, not as the only decision factor.
     </div>
     """,
