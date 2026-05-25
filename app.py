@@ -556,7 +556,6 @@ if df is not None and page in ["Dashboard", "Analytics"]:
         st.plotly_chart(fig_delay, use_container_width=True)
 
 
-```python
 # =========================================================
 # EXPLAINABLE AI PAGE
 # =========================================================
