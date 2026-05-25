@@ -635,47 +635,47 @@ if page in ["Dashboard", "Explainable AI"]:
 
         st.plotly_chart(fig_shap, use_container_width=True)
 
-    st.markdown(
-    """
-    <div style="
-        background:#EAF2FF;
-        border:1px solid #BBD3FF;
-        border-radius:12px;
-        padding:20px;
-        margin-top:15px;
-        color:#123B73;
-        font-size:14px;
-        text-align:center;
-    ">
-
+        st.markdown(
+        """
         <div style="
-            margin-bottom:14px;
-            line-height:1.7;
+            background:#EAF2FF;
+            border:1px solid #BBD3FF;
+            border-radius:12px;
+            padding:20px;
+            margin-top:15px;
+            color:#123B73;
+            font-size:14px;
+            text-align:center;
         ">
-            <b>Explanation:</b> Global Feature Importance shows which variables are most influential overall.
-            The SHAP-style chart shows whether the selected customer profile is pushed toward higher or lower default risk.
-        </div>
 
-        <div style="
-            border-top:1px solid #BBD3FF;
-            padding-top:14px;
-            color:#061A33;
-        ">
-            Developed &amp; Designed By<br>
-
-            <span style="
-                font-size:24px;
-                font-weight:800;
-                color:#005BFF;
+            <div style="
+                margin-bottom:14px;
+                line-height:1.7;
             ">
-                Agnes Jeni Makay
-            </span>
+                <b>Explanation:</b> Global Feature Importance shows which variables are most influential overall.
+                The SHAP-style chart shows whether the selected customer profile is pushed toward higher or lower default risk.
+            </div>
+
+            <div style="
+                border-top:1px solid #BBD3FF;
+                padding-top:14px;
+                color:#061A33;
+            ">
+                Developed &amp; Designed By<br>
+
+                <span style="
+                    font-size:24px;
+                    font-weight:800;
+                    color:#005BFF;
+                ">
+                    Agnes Jeni Makay
+                </span>
+
+            </div>
 
         </div>
-
-    </div>
-    """,
-    unsafe_allow_html=True
+        """,
+        unsafe_allow_html=True
     )
 # =========================================================
 # FOOTER
