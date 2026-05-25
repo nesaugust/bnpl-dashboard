@@ -226,20 +226,23 @@ def style_chart(fig, height=420, left_margin=120, bottom_margin=90):
         plot_bgcolor="white",
         font=dict(color="#061A33", size=13),
         margin=dict(l=left_margin, r=40, t=60, b=bottom_margin),
-        xaxis=dict(
-            tickfont=dict(color="#061A33", size=12),
-            titlefont=dict(color="#061A33", size=13),
-            automargin=True
-        ),
-        yaxis=dict(
-            tickfont=dict(color="#061A33", size=12),
-            titlefont=dict(color="#061A33", size=13),
-            automargin=True
-        ),
         legend=dict(
             font=dict(color="#061A33")
         )
     )
+
+    fig.update_xaxes(
+        tickfont=dict(color="#061A33", size=12),
+        title_font=dict(color="#061A33", size=13),
+        automargin=True
+    )
+
+    fig.update_yaxes(
+        tickfont=dict(color="#061A33", size=12),
+        title_font=dict(color="#061A33", size=13),
+        automargin=True
+    )
+
     return fig
 
 
