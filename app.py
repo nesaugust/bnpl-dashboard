@@ -661,7 +661,7 @@ if page in ["Dashboard", "Explainable AI"]:
             padding-top:14px;
             color:#061A33;
         ">
-            Developed & Designed By<br>
+            Developed &amp; Designed By<br>
 
             <span style="
                 font-size:24px;
@@ -675,7 +675,8 @@ if page in ["Dashboard", "Explainable AI"]:
 
     </div>
     """,
-    unsafe_allow_html=True)
+    unsafe_allow_html=True
+    )
 # =========================================================
 # FOOTER
 # =========================================================
