@@ -556,10 +556,12 @@ if df is not None and page in ["Dashboard", "Analytics"]:
         st.plotly_chart(fig_delay, use_container_width=True)
 
 
+```python
 # =========================================================
 # EXPLAINABLE AI PAGE
 # =========================================================
 if page in ["Dashboard", "Explainable AI"]:
+
     st.markdown("---")
     st.markdown("### Explainable AI")
 
@@ -567,7 +569,11 @@ if page in ["Dashboard", "Explainable AI"]:
 
     g1, g2 = st.columns(2)
 
+    # =====================================================
+    # GLOBAL FEATURE IMPORTANCE
+    # =====================================================
     with g1:
+
         st.markdown("#### Global Feature Importance")
 
         fig_imp = px.bar(
@@ -579,17 +585,38 @@ if page in ["Dashboard", "Explainable AI"]:
             title="Top Drivers of Model Prediction"
         )
 
-        fig_imp = style_chart(fig_imp, height=470, left_margin=170, bottom_margin=110)
-        fig_imp.update_xaxes(title_text="Importance")
-        fig_imp.update_yaxes(title_text="")
+        fig_imp = style_chart(
+            fig_imp,
+            height=470,
+            left_margin=170,
+            bottom_margin=110
+        )
 
-        st.plotly_chart(fig_imp, use_container_width=True)
+        fig_imp.update_xaxes(
+            title_text="Importance Score"
+        )
 
+        fig_imp.update_yaxes(
+            title_text=""
+        )
+
+        st.plotly_chart(
+            fig_imp,
+            use_container_width=True
+        )
+
+    # =====================================================
+    # SHAP STYLE EXPLANATION
+    # =====================================================
     with g2:
+
         st.markdown("#### SHAP-Style Impact Explanation")
 
         shap_df = importance_df.head(8).copy()
-        shap_df["Impact"] = shap_df["Importance"] * probability
+
+        shap_df["Impact"] = (
+            shap_df["Importance"] * probability
+        )
 
         lower_risk_features = [
             "credit_score",
@@ -629,13 +656,30 @@ if page in ["Dashboard", "Explainable AI"]:
             line_color="#061A33"
         )
 
-        fig_shap = style_chart(fig_shap, height=470, left_margin=170, bottom_margin=110)
-        fig_shap.update_xaxes(title_text="Impact on Default Probability")
-        fig_shap.update_yaxes(title_text="")
+        fig_shap = style_chart(
+            fig_shap,
+            height=470,
+            left_margin=170,
+            bottom_margin=110
+        )
 
-        st.plotly_chart(fig_shap, use_container_width=True)
+        fig_shap.update_xaxes(
+            title_text="Impact on Default Probability"
+        )
 
-        st.markdown(
+        fig_shap.update_yaxes(
+            title_text=""
+        )
+
+        st.plotly_chart(
+            fig_shap,
+            use_container_width=True
+        )
+
+    # =====================================================
+    # EXPLANATION + CREATED BY
+    # =====================================================
+    st.markdown(
         """
         <div style="
             background:#EAF2FF;
@@ -652,8 +696,10 @@ if page in ["Dashboard", "Explainable AI"]:
                 margin-bottom:14px;
                 line-height:1.7;
             ">
-                <b>Explanation:</b> Global Feature Importance shows which variables are most influential overall.
-                The SHAP-style chart shows whether the selected customer profile is pushed toward higher or lower default risk.
+                <b>Explanation:</b>
+                Global Feature Importance shows which variables are most influential overall.
+                The SHAP-style chart shows whether the selected customer profile is pushed
+                toward higher or lower default risk.
             </div>
 
             <div style="
@@ -661,7 +707,8 @@ if page in ["Dashboard", "Explainable AI"]:
                 padding-top:14px;
                 color:#061A33;
             ">
-                Developed &amp; Designed By<br>
+                Developed &amp; Designed By
+                <br>
 
                 <span style="
                     font-size:24px;
@@ -677,6 +724,8 @@ if page in ["Dashboard", "Explainable AI"]:
         """,
         unsafe_allow_html=True
     )
+
+
 # =========================================================
 # FOOTER
 # =========================================================
@@ -691,8 +740,9 @@ st.markdown(
         color:#5C4A00;
         font-size:14px;
     ">
-    This dashboard uses machine learning to predict BNPL default risk.
-    Model explanations are used to support decision-making, not as the only decision factor.
+        This dashboard uses machine learning to predict BNPL default risk.
+        Model explanations are used to support decision-making,
+        not as the only decision factor.
     </div>
     """,
     unsafe_allow_html=True
