@@ -264,15 +264,17 @@ with st.sidebar:
     st.markdown("## 💳 BNPL RISK")
     st.markdown("---")
 
-    page = st.selectbox(
-        "Navigation",
-        [
-            "Dashboard",
-            "Prediction",
-            "Analytics",
-            "Explainable AI"
-        ]
-    )
+    page = "Dashboard"
+
+st.markdown("### Sections")
+st.markdown("""
+<div class="sidebar-list">
+    <div>▸ Overview KPIs</div>
+    <div>▸ Credit Risk Prediction</div>
+    <div>▸ Data Insights</div>
+    <div>▸ Explainable AI</div>
+</div>
+""", unsafe_allow_html=True)
 
     st.markdown("---")
     st.markdown("### Model Information")
