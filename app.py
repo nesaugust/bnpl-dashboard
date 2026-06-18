@@ -266,15 +266,15 @@ with st.sidebar:
 
     page = "Dashboard"
 
-st.markdown("### Sections")
-st.markdown("""
-<div class="sidebar-list">
-    <div>▸ Overview KPIs</div>
-    <div>▸ Credit Risk Prediction</div>
-    <div>▸ Data Insights</div>
-    <div>▸ Explainable AI</div>
-</div>
-""", unsafe_allow_html=True)
+    st.markdown("### Sections")
+    st.markdown("""
+    <div class="sidebar-list">
+        <div>▸ Overview KPIs</div>
+        <div>▸ Credit Risk Prediction</div>
+        <div>▸ Data Insights</div>
+        <div>▸ Explainable AI</div>
+    </div>
+    """, unsafe_allow_html=True)
 
     st.markdown("---")
     st.markdown("### Model Information")
