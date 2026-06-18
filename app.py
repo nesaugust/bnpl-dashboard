@@ -17,174 +17,144 @@ st.set_page_config(
 )
 
 
-# =========================================================
-# CSS
-# =========================================================
 st.markdown("""
 <style>
 .stApp {
-    background: #F4F7FB;
-    color: #061A33;
+    background: linear-gradient(135deg, #F6F8FC 0%, #EEF3FA 100%);
+    color: #0F172A;
 }
 
 .block-container {
     padding-top: 2rem;
-    padding-left: 2rem;
-    padding-right: 2rem;
-    max-width: 1600px;
+    padding-left: 2.5rem;
+    padding-right: 2.5rem;
+    max-width: 1500px;
 }
 
-/* Sidebar */
-[data-testid="stSidebar"] {
-    background: linear-gradient(180deg, #001B3F 0%, #002B5C 100%);
-}
-
-[data-testid="stSidebar"] * {
-    color: white !important;
-}
-
-/* Sidebar selectbox */
-[data-testid="stSidebar"] div[data-baseweb="select"] > div {
-    background: rgba(255,255,255,0.12) !important;
-    border-radius: 12px !important;
-    border: 1px solid rgba(255,255,255,0.25) !important;
-}
-
-[data-testid="stSidebar"] div[data-baseweb="select"] span {
-    color: white !important;
-    font-weight: 700;
-}
-
-/* Titles */
 .main-title {
-    font-size: 34px;
+    font-size: 36px;
     font-weight: 800;
-    color: #061A33;
+    color: #0F172A;
+    letter-spacing: -0.6px;
 }
 
 .subtitle {
-    color: #5D6B82;
+    color: #64748B;
     font-size: 15px;
-    margin-bottom: 20px;
+    margin-bottom: 24px;
 }
 
 .section-title {
-    font-size: 21px;
+    font-size: 20px;
     font-weight: 800;
-    color: #071D49;
+    color: #0F172A;
     margin-top: 8px;
-    margin-bottom: 12px;
+    margin-bottom: 14px;
 }
 
-/* KPI cards */
-.kpi-card {
-    background: white;
-    border: 1px solid #E0E8F3;
-    border-radius: 18px;
-    padding: 20px;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.05);
-    min-height: 105px;
+.kpi-card,
+.result-card,
+.info-card {
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 22px;
+    padding: 24px;
+    box-shadow: 0 12px 30px rgba(15,23,42,0.06);
 }
 
 .kpi-label {
-    font-size: 13px;
-    color: #6B7280;
+    font-size: 12px;
+    color: #64748B;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
 }
 
 .kpi-value {
-    font-size: 28px;
+    font-size: 30px;
     font-weight: 800;
-    color: #061A33;
+    color: #0F172A;
+    margin-top: 8px;
 }
 
-/* Cards */
-.result-card {
-    background: white;
-    border: 1px solid #E0E8F3;
-    border-radius: 18px;
-    padding: 24px;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.05);
-}
-
-.info-card {
-    background: white;
-    border: 1px solid #E0E8F3;
-    border-radius: 18px;
-    padding: 22px;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.05);
-}
-
-/* Risk labels */
 .risk-low {
-    background: #DDF8E8;
-    color: #118D57;
-    padding: 14px;
-    border-radius: 12px;
+    background: #DCFCE7;
+    color: #166534;
+    padding: 16px;
+    border-radius: 14px;
     text-align: center;
     font-size: 26px;
     font-weight: 800;
 }
 
 .risk-medium {
-    background: #FFF4CC;
-    color: #B88400;
-    padding: 14px;
-    border-radius: 12px;
+    background: #FEF3C7;
+    color: #92400E;
+    padding: 16px;
+    border-radius: 14px;
     text-align: center;
     font-size: 26px;
     font-weight: 800;
 }
 
 .risk-high {
-    background: #FFE1E1;
-    color: #D62828;
-    padding: 14px;
-    border-radius: 12px;
+    background: #FEE2E2;
+    color: #991B1B;
+    padding: 16px;
+    border-radius: 14px;
     text-align: center;
     font-size: 26px;
     font-weight: 800;
 }
 
 .recommend-box {
-    background: #EAF8F0;
-    color: #0F5132;
+    background: #F1F5F9;
+    color: #334155;
     padding: 14px;
-    border-radius: 12px;
+    border-radius: 14px;
     font-size: 14px;
+    line-height: 1.5;
 }
 
-/* Inputs */
 label {
-    color: #071D49 !important;
-    font-weight: 600 !important;
+    color: #334155 !important;
+    font-weight: 700 !important;
+    font-size: 13px !important;
 }
 
-input {
-    background-color: white !important;
-    color: #061A33 !important;
-}
-
+input,
 div[data-baseweb="select"] > div {
-    background-color: white !important;
-    color: #061A33 !important;
+    background-color: #FFFFFF !important;
+    color: #0F172A !important;
+    border: 1px solid #CBD5E1 !important;
+    border-radius: 12px !important;
 }
 
-/* Button */
 .stButton > button {
     width: 100%;
     height: 48px;
-    background: linear-gradient(90deg, #005BFF, #287DFF);
+    background: linear-gradient(135deg, #2563EB, #1D4ED8);
     color: white;
     border: none;
-    border-radius: 10px;
-    font-weight: 700;
+    border-radius: 12px;
+    font-weight: 800;
+}
+
+.stButton > button:hover {
+    background: linear-gradient(135deg, #1D4ED8, #1E40AF);
+}
+
+.js-plotly-plot {
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid #E2E8F0;
+    box-shadow: 0 12px 28px rgba(15,23,42,0.06);
 }
 
 #MainMenu {visibility: hidden;}
 footer {visibility: hidden;}
 </style>
 """, unsafe_allow_html=True)
-
 
 # =========================================================
 # LOAD FILES
@@ -400,124 +370,47 @@ if page in ["Dashboard", "Prediction", "Explainable AI"]:
 
     st.markdown('<div class="section-title">Predict Credit Risk</div>', unsafe_allow_html=True)
 
-    left, middle, right = st.columns([2.1, 1.1, 1.1])
+    left, middle = st.columns([2.2, 1])
 
     with left:
-        c1, c2, c3 = st.columns(3)
+    st.markdown('<div class="info-card">', unsafe_allow_html=True)
 
-        with c1:
-            age = st.number_input("Age", 18, 80, 30)
-            employment_type = st.selectbox(
-                "Employment Type",
-                ["Employed", "Self-Employed", "Student", "Unemployed"]
-            )
-            purchase_amount = st.number_input("Purchase Amount", value=500.0)
-            missed_payments = st.number_input("Missed Payments", value=0)
-            location = st.selectbox(
-                "Location",
-                ["Australia", "Canada", "Germany", "India", "UK", "USA"]
-            )
+    c1, c2 = st.columns(2)
 
-        with c2:
-            monthly_income = st.number_input("Monthly Income", value=5000.0)
-            debt_to_income_ratio = st.number_input("Debt to Income Ratio", value=0.30)
-            bnpl_installments = st.selectbox(
-                "BNPL Installments",
-                [1, 2, 3, 4, 6, 8, 10, 12],
-                index=3
-            )
-            risk_score = st.slider("Risk Score", 0.0, 1.0, 0.50)
-            customer_segment = st.selectbox(
-                "Customer Segment",
-                ["High Risk", "Low Risk", "Medium Risk"]
-            )
+    with c1:
+        monthly_income = st.number_input("Monthly Income", value=5000.0)
+        credit_score = st.number_input("Credit Score", 300, 850, 650)
+        debt_to_income_ratio = st.number_input("Debt to Income Ratio", value=0.30)
+        missed_payments = st.number_input("Missed Payments", value=0)
+
+    with c2:
+        purchase_amount = st.number_input("Purchase Amount", value=500.0)
+        bnpl_installments = st.selectbox("BNPL Installments", [1, 2, 3, 4, 6, 8, 10, 12], index=3)
+        repayment_delay_days = st.number_input("Repayment Delay Days", value=0)
+        app_usage_frequency = st.number_input("App Usage Frequency", value=10.0)
+
+    with st.expander("Advanced customer details"):
+        c3, c4, c5 = st.columns(3)
 
         with c3:
-            credit_score = st.number_input("Credit Score", 300, 850, 650)
-            app_usage_frequency = st.number_input("App Usage Frequency", value=10.0)
-            repayment_delay_days = st.number_input("Repayment Delay Days", value=0)
-            product_category = st.selectbox(
-                "Product Category",
-                ["Beauty", "Electronics", "Fashion", "Home", "Sports"]
-            )
+            age = st.number_input("Age", 18, 80, 30)
+            employment_type = st.selectbox("Employment Type", ["Employed", "Self-Employed", "Student", "Unemployed"])
+
+        with c4:
+            location = st.selectbox("Location", ["Australia", "Canada", "Germany", "India", "UK", "USA"])
+            product_category = st.selectbox("Product Category", ["Beauty", "Electronics", "Fashion", "Home", "Sports"])
+
+        with c5:
+            customer_segment = st.selectbox("Customer Segment", ["Low Risk", "Medium Risk", "High Risk"])
             transaction_date = st.date_input("Transaction Date")
 
-        predict_button = st.button("Predict Risk")
+    risk_score = 0.50
 
-    input_data = pd.DataFrame({
-        "age": [age],
-        "monthly_income": [monthly_income],
-        "credit_score": [credit_score],
-        "purchase_amount": [purchase_amount],
-        "bnpl_installments": [bnpl_installments],
-        "repayment_delay_days": [repayment_delay_days],
-        "missed_payments": [missed_payments],
-        "app_usage_frequency": [app_usage_frequency],
-        "debt_to_income_ratio": [debt_to_income_ratio],
-        "risk_score": [risk_score],
-        "transaction_month": [transaction_date.month],
-        "transaction_year": [transaction_date.year],
-        "transaction_day": [transaction_date.day],
-        "employment_type_Self-Employed": [1 if employment_type == "Self-Employed" else 0],
-        "employment_type_Student": [1 if employment_type == "Student" else 0],
-        "employment_type_Unemployed": [1 if employment_type == "Unemployed" else 0],
-        "product_category_Electronics": [1 if product_category == "Electronics" else 0],
-        "product_category_Fashion": [1 if product_category == "Fashion" else 0],
-        "product_category_Home": [1 if product_category == "Home" else 0],
-        "product_category_Sports": [1 if product_category == "Sports" else 0],
-        "location_Canada": [1 if location == "Canada" else 0],
-        "location_Germany": [1 if location == "Germany" else 0],
-        "location_India": [1 if location == "India" else 0],
-        "location_UK": [1 if location == "UK" else 0],
-        "location_USA": [1 if location == "USA" else 0],
-        "customer_segment_Low Risk": [1 if customer_segment == "Low Risk" else 0],
-        "customer_segment_Medium Risk": [1 if customer_segment == "Medium Risk" else 0],
-    })
+    predict_button = st.button("Predict Risk")
 
-    for col in feature_columns:
-        if col not in input_data.columns:
-            input_data[col] = 0
+    st.markdown('</div>', unsafe_allow_html=True)
 
-    input_data = input_data[feature_columns]
-
-    probability = predict_probability(model, input_data)
-
-    if probability < 0.30:
-        risk_label = "Low Risk"
-        risk_class = "risk-low"
-        recommendation = "Customer is likely safe for BNPL approval."
-    elif probability < 0.60:
-        risk_label = "Medium Risk"
-        risk_class = "risk-medium"
-        recommendation = "Customer requires additional review before approval."
-    else:
-        risk_label = "High Risk"
-        risk_class = "risk-high"
-        recommendation = "Customer has high default risk. Consider rejecting or lowering credit limit."
-
-    with middle:
-        st.markdown('<div class="section-title">Prediction Result</div>', unsafe_allow_html=True)
-
-        st.markdown(
-            f"""
-            <div class="result-card">
-                <p><b>Default Probability</b></p>
-                <h1 style="text-align:center; color:#005BFF; font-size:48px;">{probability * 100:.2f}%</h1>
-                <p><b>Risk Level</b></p>
-                <div class="{risk_class}">{risk_label}</div>
-                <br>
-                <p><b>Recommendation</b></p>
-                <div class="recommend-box">{recommendation}</div>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-
-    with right:
-        st.markdown('<div class="section-title">Default Probability</div>', unsafe_allow_html=True)
-        st.plotly_chart(create_gauge(probability), use_container_width=True)
-
-
+    
 # =========================================================
 # ANALYTICS PAGE
 # =========================================================
