@@ -370,12 +370,6 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-st.markdown(
-    '<div class="subtitle">Predict customer default risk using machine learning and explainable AI.</div>',
-    unsafe_allow_html=True
-)
-
-
 # =========================================================
 # KPI SECTION
 # =========================================================
@@ -415,6 +409,7 @@ if df is not None and page in ["Dashboard", "Analytics"]:
 # INPUT SECTION
 # =========================================================
 if page in ["Dashboard", "Prediction", "Explainable AI"]:
+
     title_left, title_right = st.columns([1.7, 1])
 
     with title_left:
@@ -426,41 +421,50 @@ if page in ["Dashboard", "Prediction", "Explainable AI"]:
     left, middle = st.columns([1.7, 1])
 
     with left:
-        st.markdown('<div class="info-card">', unsafe_allow_html=True)
+        with st.container(border=True):
+            c1, c2 = st.columns(2)
 
-        c1, c2 = st.columns(2)
+            with c1:
+                monthly_income = st.number_input("Monthly Income", value=5000.0)
+                credit_score = st.number_input("Credit Score", 300, 850, 650)
+                debt_to_income_ratio = st.number_input("Debt to Income Ratio", value=0.30)
+                missed_payments = st.number_input("Missed Payments", value=0)
 
-        with c1:
-            monthly_income = st.number_input("Monthly Income", value=5000.0)
-            credit_score = st.number_input("Credit Score", 300, 850, 650)
-            debt_to_income_ratio = st.number_input("Debt to Income Ratio", value=0.30)
-            missed_payments = st.number_input("Missed Payments", value=0)
+            with c2:
+                purchase_amount = st.number_input("Purchase Amount", value=500.0)
+                bnpl_installments = st.selectbox("BNPL Installments", [1, 2, 3, 4, 6, 8, 10, 12], index=3)
+                repayment_delay_days = st.number_input("Repayment Delay Days", value=0)
+                app_usage_frequency = st.number_input("App Usage Frequency", value=10.0)
 
-        with c2:
-            purchase_amount = st.number_input("Purchase Amount", value=500.0)
-            bnpl_installments = st.selectbox("BNPL Installments", [1, 2, 3, 4, 6, 8, 10, 12], index=3)
-            repayment_delay_days = st.number_input("Repayment Delay Days", value=0)
-            app_usage_frequency = st.number_input("App Usage Frequency", value=10.0)
+            with st.expander("Advanced customer details"):
+                c3, c4, c5 = st.columns(3)
 
-        with st.expander("Advanced customer details"):
-            c3, c4, c5 = st.columns(3)
+                with c3:
+                    age = st.number_input("Age", 18, 80, 30)
+                    employment_type = st.selectbox(
+                        "Employment Type",
+                        ["Employed", "Self-Employed", "Student", "Unemployed"]
+                    )
 
-            with c3:
-                age = st.number_input("Age", 18, 80, 30)
-                employment_type = st.selectbox("Employment Type", ["Employed", "Self-Employed", "Student", "Unemployed"])
+                with c4:
+                    location = st.selectbox(
+                        "Location",
+                        ["Australia", "Canada", "Germany", "India", "UK", "USA"]
+                    )
+                    product_category = st.selectbox(
+                        "Product Category",
+                        ["Beauty", "Electronics", "Fashion", "Home", "Sports"]
+                    )
 
-            with c4:
-                location = st.selectbox("Location", ["Australia", "Canada", "Germany", "India", "UK", "USA"])
-                product_category = st.selectbox("Product Category", ["Beauty", "Electronics", "Fashion", "Home", "Sports"])
+                with c5:
+                    customer_segment = st.selectbox(
+                        "Customer Segment",
+                        ["Low Risk", "Medium Risk", "High Risk"]
+                    )
+                    transaction_date = st.date_input("Transaction Date")
 
-            with c5:
-                customer_segment = st.selectbox("Customer Segment", ["Low Risk", "Medium Risk", "High Risk"])
-                transaction_date = st.date_input("Transaction Date")
-
-        risk_score = 0.50
-        predict_button = st.button("Predict Risk")
-
-        st.markdown('</div>', unsafe_allow_html=True)
+            risk_score = 0.50
+            predict_button = st.button("Predict Risk")
 
     input_data = pd.DataFrame({
         "age": [age],
@@ -513,12 +517,12 @@ if page in ["Dashboard", "Prediction", "Explainable AI"]:
         risk_class = "risk-high"
         recommendation = "Customer has high default risk. Consider rejecting or lowering credit limit."
 
-
+    with middle:
         st.markdown(
             f"""
             <div class="result-card">
                 <p><b>Default Probability</b></p>
-                <h1 style="text-align:center; color:#2563EB; font-size:48px;">{probability * 100:.2f}%</h1>
+                <h1 style="text-align:center; color:#2563EB; font-size:52px;">{probability * 100:.2f}%</h1>
                 <p><b>Risk Level</b></p>
                 <div class="{risk_class}">{risk_label}</div>
                 <br>
