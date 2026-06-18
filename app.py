@@ -3,7 +3,6 @@ import joblib
 import numpy as np
 import pandas as pd
 import plotly.express as px
-import plotly.graph_objects as go
 import streamlit as st
 
 
@@ -258,35 +257,6 @@ def predict_probability(model, input_data):
     return float(model.predict(input_data)[0])
 
 
-def create_gauge(probability):
-    fig = go.Figure(go.Indicator(
-        mode="gauge+number",
-        value=probability * 100,
-        number={
-            "suffix": "%",
-            "font": {"size": 30, "color": "#061A33"}
-        },
-        gauge={
-            "axis": {"range": [0, 100]},
-            "bar": {"color": "#005BFF"},
-            "steps": [
-                {"range": [0, 30], "color": "#DDF8E8"},
-                {"range": [30, 60], "color": "#FFF4CC"},
-                {"range": [60, 100], "color": "#FFE1E1"}
-            ],
-        }
-    ))
-
-    fig.update_layout(
-        height=300,
-        paper_bgcolor="white",
-        font=dict(color="#061A33"),
-        margin=dict(l=40, r=40, t=40, b=40)
-    )
-
-    return fig
-
-
 # =========================================================
 # SIDEBAR
 # =========================================================
@@ -373,42 +343,110 @@ if page in ["Dashboard", "Prediction", "Explainable AI"]:
     left, middle = st.columns([2.2, 1])
 
     with left:
-    st.markdown('<div class="info-card">', unsafe_allow_html=True)
+        st.markdown('<div class="info-card">', unsafe_allow_html=True)
 
-    c1, c2 = st.columns(2)
+        c1, c2 = st.columns(2)
 
-    with c1:
-        monthly_income = st.number_input("Monthly Income", value=5000.0)
-        credit_score = st.number_input("Credit Score", 300, 850, 650)
-        debt_to_income_ratio = st.number_input("Debt to Income Ratio", value=0.30)
-        missed_payments = st.number_input("Missed Payments", value=0)
+        with c1:
+            monthly_income = st.number_input("Monthly Income", value=5000.0)
+            credit_score = st.number_input("Credit Score", 300, 850, 650)
+            debt_to_income_ratio = st.number_input("Debt to Income Ratio", value=0.30)
+            missed_payments = st.number_input("Missed Payments", value=0)
 
-    with c2:
-        purchase_amount = st.number_input("Purchase Amount", value=500.0)
-        bnpl_installments = st.selectbox("BNPL Installments", [1, 2, 3, 4, 6, 8, 10, 12], index=3)
-        repayment_delay_days = st.number_input("Repayment Delay Days", value=0)
-        app_usage_frequency = st.number_input("App Usage Frequency", value=10.0)
+        with c2:
+            purchase_amount = st.number_input("Purchase Amount", value=500.0)
+            bnpl_installments = st.selectbox("BNPL Installments", [1, 2, 3, 4, 6, 8, 10, 12], index=3)
+            repayment_delay_days = st.number_input("Repayment Delay Days", value=0)
+            app_usage_frequency = st.number_input("App Usage Frequency", value=10.0)
 
-    with st.expander("Advanced customer details"):
-        c3, c4, c5 = st.columns(3)
+        with st.expander("Advanced customer details"):
+            c3, c4, c5 = st.columns(3)
 
-        with c3:
-            age = st.number_input("Age", 18, 80, 30)
-            employment_type = st.selectbox("Employment Type", ["Employed", "Self-Employed", "Student", "Unemployed"])
+            with c3:
+                age = st.number_input("Age", 18, 80, 30)
+                employment_type = st.selectbox("Employment Type", ["Employed", "Self-Employed", "Student", "Unemployed"])
 
-        with c4:
-            location = st.selectbox("Location", ["Australia", "Canada", "Germany", "India", "UK", "USA"])
-            product_category = st.selectbox("Product Category", ["Beauty", "Electronics", "Fashion", "Home", "Sports"])
+            with c4:
+                location = st.selectbox("Location", ["Australia", "Canada", "Germany", "India", "UK", "USA"])
+                product_category = st.selectbox("Product Category", ["Beauty", "Electronics", "Fashion", "Home", "Sports"])
 
-        with c5:
-            customer_segment = st.selectbox("Customer Segment", ["Low Risk", "Medium Risk", "High Risk"])
-            transaction_date = st.date_input("Transaction Date")
+            with c5:
+                customer_segment = st.selectbox("Customer Segment", ["Low Risk", "Medium Risk", "High Risk"])
+                transaction_date = st.date_input("Transaction Date")
 
-    risk_score = 0.50
+        risk_score = 0.50
+        predict_button = st.button("Predict Risk")
 
-    predict_button = st.button("Predict Risk")
+        st.markdown('</div>', unsafe_allow_html=True)
 
-    st.markdown('</div>', unsafe_allow_html=True)
+    input_data = pd.DataFrame({
+        "age": [age],
+        "monthly_income": [monthly_income],
+        "credit_score": [credit_score],
+        "purchase_amount": [purchase_amount],
+        "bnpl_installments": [bnpl_installments],
+        "repayment_delay_days": [repayment_delay_days],
+        "missed_payments": [missed_payments],
+        "app_usage_frequency": [app_usage_frequency],
+        "debt_to_income_ratio": [debt_to_income_ratio],
+        "risk_score": [risk_score],
+        "transaction_month": [transaction_date.month],
+        "transaction_year": [transaction_date.year],
+        "transaction_day": [transaction_date.day],
+        "employment_type_Self-Employed": [1 if employment_type == "Self-Employed" else 0],
+        "employment_type_Student": [1 if employment_type == "Student" else 0],
+        "employment_type_Unemployed": [1 if employment_type == "Unemployed" else 0],
+        "product_category_Electronics": [1 if product_category == "Electronics" else 0],
+        "product_category_Fashion": [1 if product_category == "Fashion" else 0],
+        "product_category_Home": [1 if product_category == "Home" else 0],
+        "product_category_Sports": [1 if product_category == "Sports" else 0],
+        "location_Canada": [1 if location == "Canada" else 0],
+        "location_Germany": [1 if location == "Germany" else 0],
+        "location_India": [1 if location == "India" else 0],
+        "location_UK": [1 if location == "UK" else 0],
+        "location_USA": [1 if location == "USA" else 0],
+        "customer_segment_Low Risk": [1 if customer_segment == "Low Risk" else 0],
+        "customer_segment_Medium Risk": [1 if customer_segment == "Medium Risk" else 0],
+    })
+
+    for col in feature_columns:
+        if col not in input_data.columns:
+            input_data[col] = 0
+
+    input_data = input_data[feature_columns]
+
+    probability = predict_probability(model, input_data)
+
+    if probability < 0.30:
+        risk_label = "Low Risk"
+        risk_class = "risk-low"
+        recommendation = "Customer is likely safe for BNPL approval."
+    elif probability < 0.60:
+        risk_label = "Medium Risk"
+        risk_class = "risk-medium"
+        recommendation = "Customer requires additional review before approval."
+    else:
+        risk_label = "High Risk"
+        risk_class = "risk-high"
+        recommendation = "Customer has high default risk. Consider rejecting or lowering credit limit."
+
+    with middle:
+        st.markdown('<div class="section-title">Prediction Result</div>', unsafe_allow_html=True)
+
+        st.markdown(
+            f"""
+            <div class="result-card">
+                <p><b>Default Probability</b></p>
+                <h1 style="text-align:center; color:#2563EB; font-size:48px;">{probability * 100:.2f}%</h1>
+                <p><b>Risk Level</b></p>
+                <div class="{risk_class}">{risk_label}</div>
+                <br>
+                <p><b>Recommendation</b></p>
+                <div class="recommend-box">{recommendation}</div>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
     
 # =========================================================
