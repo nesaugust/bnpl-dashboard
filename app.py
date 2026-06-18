@@ -19,7 +19,9 @@ st.set_page_config(
 st.markdown("""
 <style>
 .stApp {
-    background: linear-gradient(135deg, #F6F8FC 0%, #EEF3FA 100%);
+    background:
+        radial-gradient(circle at top left, rgba(37,99,235,0.10), transparent 28%),
+        linear-gradient(135deg, #E9EEF6 0%, #DDE6F2 45%, #F3F6FA 100%);
     color: #0F172A;
 }
 
@@ -30,41 +32,68 @@ st.markdown("""
     max-width: 1500px;
 }
 
+/* Sidebar */
+section[data-testid="stSidebar"] {
+    background:
+        linear-gradient(180deg, #0F172A 0%, #111827 55%, #020617 100%);
+    border-right: 1px solid rgba(148,163,184,0.24);
+}
+
+section[data-testid="stSidebar"] * {
+    color: #E5E7EB !important;
+}
+
+.sidebar-list {
+    background: rgba(30,41,59,0.72);
+    border: 1px solid rgba(148,163,184,0.18);
+    border-radius: 16px;
+    padding: 14px 16px;
+    line-height: 2.1;
+    font-weight: 700;
+    color: #CBD5E1;
+}
+
+/* Header */
 .main-title {
-    font-size: 36px;
+    font-size: 38px;
     font-weight: 800;
     color: #0F172A;
-    letter-spacing: -0.6px;
+    letter-spacing: -0.8px;
 }
 
 .subtitle {
-    color: #64748B;
+    color: #475569;
     font-size: 15px;
     margin-bottom: 24px;
 }
 
 .section-title {
-    font-size: 20px;
+    font-size: 21px;
     font-weight: 800;
     color: #0F172A;
-    margin-top: 8px;
+    margin-top: 10px;
     margin-bottom: 14px;
 }
 
+/* Cards */
 .kpi-card,
 .result-card,
 .info-card {
-    background: #FFFFFF;
-    border: 1px solid #E2E8F0;
+    background: linear-gradient(145deg, #FFFFFF 0%, #F8FAFC 100%);
+    border: 1px solid #D8E1EE;
     border-radius: 22px;
     padding: 24px;
-    box-shadow: 0 12px 30px rgba(15,23,42,0.06);
+    box-shadow: 0 16px 36px rgba(15,23,42,0.08);
+}
+
+.kpi-card {
+    min-height: 110px;
 }
 
 .kpi-label {
     font-size: 12px;
     color: #64748B;
-    font-weight: 700;
+    font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.06em;
 }
@@ -76,6 +105,7 @@ st.markdown("""
     margin-top: 8px;
 }
 
+/* Risk labels */
 .risk-low {
     background: #DCFCE7;
     color: #166534;
@@ -107,14 +137,16 @@ st.markdown("""
 }
 
 .recommend-box {
-    background: #F1F5F9;
-    color: #334155;
+    background: #EEF6FF;
+    border: 1px solid #BFDBFE;
+    color: #1E3A8A;
     padding: 14px;
     border-radius: 14px;
     font-size: 14px;
     line-height: 1.5;
 }
 
+/* Inputs */
 label {
     color: #334155 !important;
     font-weight: 700 !important;
@@ -123,31 +155,68 @@ label {
 
 input,
 div[data-baseweb="select"] > div {
-    background-color: #FFFFFF !important;
+    background-color: #F8FAFC !important;
     color: #0F172A !important;
     border: 1px solid #CBD5E1 !important;
     border-radius: 12px !important;
 }
 
+div[data-baseweb="select"] span {
+    color: #0F172A !important;
+}
+
+/* Expander */
+details {
+    background: #F8FAFC !important;
+    border: 1px solid #E2E8F0 !important;
+    border-radius: 14px !important;
+    padding: 8px 12px !important;
+}
+
+/* Button */
 .stButton > button {
     width: 100%;
     height: 48px;
-    background: linear-gradient(135deg, #2563EB, #1D4ED8);
-    color: white;
+    background: linear-gradient(135deg, #1D4ED8, #2563EB);
+    color: white !important;
     border: none;
     border-radius: 12px;
     font-weight: 800;
+    box-shadow: 0 10px 24px rgba(37,99,235,0.24);
 }
 
 .stButton > button:hover {
-    background: linear-gradient(135deg, #1D4ED8, #1E40AF);
+    background: linear-gradient(135deg, #1E40AF, #1D4ED8);
 }
 
+/* Charts */
 .js-plotly-plot {
-    border-radius: 20px;
+    border-radius: 22px;
     overflow: hidden;
-    border: 1px solid #E2E8F0;
-    box-shadow: 0 12px 28px rgba(15,23,42,0.06);
+    border: 1px solid #D8E1EE;
+    box-shadow: 0 16px 36px rgba(15,23,42,0.08);
+}
+
+/* Explanation box */
+.explanation-box {
+    background: #EFF6FF;
+    border: 1px solid #BFDBFE;
+    border-radius: 16px;
+    padding: 16px;
+    margin-top: 15px;
+    color: #1E3A8A;
+    font-size: 14px;
+}
+
+/* Footer */
+.footer-box {
+    background: #F8FAFC;
+    border: 1px solid #D8E1EE;
+    border-radius: 16px;
+    padding: 16px;
+    margin-top: 20px;
+    color: #475569;
+    font-size: 14px;
 }
 
 #MainMenu {visibility: hidden;}
