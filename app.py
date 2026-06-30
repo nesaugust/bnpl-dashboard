@@ -585,43 +585,46 @@ if page in ["Dashboard", "Prediction", "Explainable AI"]:
     explanation_html = "".join([f"<li>{exp}</li>" for exp in explanations])
 
     with middle:
-        result_html = f"""
-    <div class="result-card">
-        <p><b>Default Probability</b></p>
+        with st.container(border=True):
 
-        <h1 style="text-align:center; color:#2563EB; font-size:52px;">
-            {probability * 100:.2f}%
-        </h1>
+            st.markdown("**Default Probability**")
 
-        <p style="text-align:center; color:#64748B;">
-            Base model probability: {base_probability * 100:.2f}%<br>
-            Business-rule adjustment: +{risk_adjustment * 100:.2f}%
-        </p>
+            st.markdown(
+                f"<h1 style='text-align:center;color:#2563EB;font-size:52px'>{probability*100:.2f}%</h1>",
+                unsafe_allow_html=True,
+            )
 
-        <p><b>Risk Level</b></p>
-        <div class="{risk_class}">
-            {risk_label}
-        </div>
+            st.caption(
+                f"Base Model: {base_probability*100:.2f}%   |   "
+                f"Business Rules: +{risk_adjustment*100:.2f}%"
+            )
 
-        <br>
+            st.markdown("**Risk Level**")
 
-        <p><b>Recommendation</b></p>
-        <div class="recommend-box">
-            {recommendation}
-        </div>
+            st.markdown(
+                f'<div class="{risk_class}">{risk_label}</div>',
+                unsafe_allow_html=True,
+            )
 
-        <br>
+            st.markdown("<br>", unsafe_allow_html=True)
 
-        <p><b>Adjustment Explanation</b></p>
-        <div class="recommend-box">
-            <ul style="margin-bottom:0;">
-                {explanation_html}
-            </ul>
-        </div>
-    </div>
-    """
+            st.markdown("**Recommendation**")
 
-        st.markdown(result_html, unsafe_allow_html=True)
+            st.markdown(
+                f'<div class="recommend-box">{recommendation}</div>',
+                unsafe_allow_html=True,
+            )
+
+            st.markdown("<br>", unsafe_allow_html=True)
+
+            st.markdown("**Adjustment Explanation**")
+
+            st.markdown(
+                "<div class='recommend-box'>"
+                + "".join([f"• {e}<br>" for e in explanations])
+                + "</div>",
+                unsafe_allow_html=True,
+            )
     
 # =========================================================
 # ANALYTICS PAGE
