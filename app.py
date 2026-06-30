@@ -582,54 +582,46 @@ if page in ["Dashboard", "Prediction", "Explainable AI"]:
         risk_class = "risk-high"
         recommendation = "Customer has high default risk. Consider rejecting or lowering credit limit."
 
-    explanation_html = "".join(
-    [f"<li>{exp}</li>" for exp in explanations]
-    )
+    explanation_html = "".join([f"<li>{exp}</li>" for exp in explanations])
 
     with middle:
-        st.markdown(
-            f"""
-            <div class="result-card">
-                <p><b>Default Probability</b></p>
+        result_html = f"""
+    <div class="result-card">
+        <p><b>Default Probability</b></p>
 
-                <h1 style="text-align:center; color:#2563EB; font-size:52px;">
-                    {probability * 100:.2f}%
-                </h1>
+        <h1 style="text-align:center; color:#2563EB; font-size:52px;">
+            {probability * 100:.2f}%
+        </h1>
 
-                <p style="text-align:center; color:#64748B;">
-                    Base model probability: {base_probability * 100:.2f}%<br>
-                    Business-rule adjustment: +{risk_adjustment * 100:.2f}%
-                </p>
+        <p style="text-align:center; color:#64748B;">
+            Base model probability: {base_probability * 100:.2f}%<br>
+            Business-rule adjustment: +{risk_adjustment * 100:.2f}%
+        </p>
 
-                <p><b>Risk Level</b></p>
+        <p><b>Risk Level</b></p>
+        <div class="{risk_class}">
+            {risk_label}
+        </div>
 
-                <div class="{risk_class}">
-                    {risk_label}
-                </div>
+        <br>
 
-                <br>
+        <p><b>Recommendation</b></p>
+        <div class="recommend-box">
+            {recommendation}
+        </div>
 
-                <p><b>Recommendation</b></p>
+        <br>
 
-                <div class="recommend-box">
-                    {recommendation}
-                </div>
+        <p><b>Adjustment Explanation</b></p>
+        <div class="recommend-box">
+            <ul style="margin-bottom:0;">
+                {explanation_html}
+            </ul>
+        </div>
+    </div>
+    """
 
-                <br>
-
-                <p><b>Adjustment Explanation</b></p>
-
-                <div class="recommend-box">
-                    <ul style="margin-bottom:0;">
-                        {explanation_html}
-                    </ul>
-                </div>
-
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-
+        st.markdown(result_html, unsafe_allow_html=True)
     
 # =========================================================
 # ANALYTICS PAGE
