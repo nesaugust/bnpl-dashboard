@@ -582,6 +582,47 @@ if page in ["Dashboard", "Prediction", "Explainable AI"]:
         risk_class = "risk-high"
         recommendation = "Customer has high default risk. Consider rejecting or lowering credit limit."
 
+    # Advanced customer details
+    if age >= 60:
+        risk_adjustment += 0.05
+        explanations.append("Older customer age slightly increased default risk.")
+    elif age < 21:
+        risk_adjustment += 0.05
+        explanations.append("Very young customer age slightly increased default risk.")
+    if employment_type == "Unemployed":
+        risk_adjustment += 0.20
+        explanations.append("Unemployed status increased default risk.")
+    
+    elif employment_type == "Self-Employed":
+        risk_adjustment += 0.08
+        explanations.append("Self-employed status slightly increased default risk.")
+    elif employment_type == "Student":
+        risk_adjustment += 0.05
+        explanations.append("Student status slightly increased default risk.")
+
+    if customer_segment == "High Risk":
+        risk_adjustment += 0.20
+        explanations.append("Customer segment is marked as High Risk.")
+    elif customer_segment == "Medium Risk":
+        risk_adjustment += 0.10
+        explanations.append("Customer segment is marked as Medium Risk.")
+
+    if product_category == "Electronics":
+        risk_adjustment += 0.05
+        explanations.append("Electronics purchases slightly increased default risk.")
+    elif product_category == "Beauty":
+        risk_adjustment += 0.03
+        explanations.append("Beauty purchases slightly increased default risk.")
+
+    if location in ["India"]:
+        risk_adjustment += 0.03
+        explanations.append("Location-based risk adjustment was applied.")
+
+    # Transaction date logic
+    if transaction_date.month in [11, 12]:
+        risk_adjustment += 0.03
+        explanations.append("End-of-year transaction period slightly increased risk.")
+
     explanation_html = "".join([f"<li>{exp}</li>" for exp in explanations])
 
     with middle:
