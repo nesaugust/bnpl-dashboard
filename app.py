@@ -564,23 +564,8 @@ if page in ["Dashboard", "Prediction", "Explainable AI"]:
         risk_adjustment += 0.08
         explanations.append("Minor repayment delay slightly increased risk.")
 
-    probability = min(base_probability + risk_adjustment, 0.99)
-
     if len(explanations) == 0:
         explanations.append("No additional business-rule adjustments were applied.")
-
-    if probability < 0.30:
-        risk_label = "Low Risk"
-        risk_class = "risk-low"
-        recommendation = "Customer is likely safe for BNPL approval."
-    elif probability < 0.60:
-        risk_label = "Medium Risk"
-        risk_class = "risk-medium"
-        recommendation = "Customer requires additional review before approval."
-    else:
-        risk_label = "High Risk"
-        risk_class = "risk-high"
-        recommendation = "Customer has high default risk. Consider rejecting or lowering credit limit."
 
     # Advanced customer details
     if age >= 60:
@@ -666,7 +651,20 @@ if page in ["Dashboard", "Prediction", "Explainable AI"]:
                 + "</div>",
                 unsafe_allow_html=True,
             )
-    
+            
+        probability = min(base_probability + risk_adjustment, 0.99) 
+        if probability < 0.30:
+            risk_label = "Low Risk"
+            risk_class = "risk-low"
+            recommendation = "Customer is likely safe for BNPL approval."
+        elif probability < 0.60:
+            risk_label = "Medium Risk"
+            risk_class = "risk-medium"
+            recommendation = "Customer requires additional review before approval."
+        else:
+            risk_label = "High Risk"
+            risk_class = "risk-high"
+            recommendation = "Customer has high default risk. Consider rejecting or lowering credit limit."
 # =========================================================
 # ANALYTICS PAGE
 # =========================================================
