@@ -589,9 +589,8 @@ if page in ["Dashboard", "Prediction", "Explainable AI"]:
     elif age < 21:
         risk_adjustment += 0.05
         explanations.append("Very young customer age slightly increased default risk.")
-    if employment_type == "Employed":
-        explanations.append("Employed status is treated as the baseline employment category.")
-    elif employment_type == "Self-Employed":
+    
+    if employment_type == "Self-Employed":
         risk_adjustment += 0.08
         explanations.append("Self-employed status slightly increased default risk.")
     elif employment_type == "Student":
