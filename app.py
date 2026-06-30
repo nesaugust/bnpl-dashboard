@@ -504,9 +504,13 @@ if page in ["Dashboard", "Prediction", "Explainable AI"]:
 
     probability = predict_probability(model, input_data)
 
-    # -----------------------------
-    # Business rule adjustments
-    # -----------------------------
+    # =========================================================
+    # BUSINESS RULE ADJUSTMENT + EXPLANATION
+    # =========================================================
+
+    base_probability = probability
+    explanations = []
+
     purchase_income_ratio = purchase_amount / max(monthly_income, 1)
     installment_amount = purchase_amount / max(bnpl_installments, 1)
     installment_income_ratio = installment_amount / max(monthly_income, 1)
@@ -515,35 +519,55 @@ if page in ["Dashboard", "Prediction", "Explainable AI"]:
 
     if monthly_income < 500:
         risk_adjustment += 0.25
+        explanations.append("Very low monthly income increased default risk.")
 
     if purchase_income_ratio > 1:
         risk_adjustment += 0.25
+        explanations.append(
+            f"Purchase amount is {purchase_income_ratio:.1f}× higher than monthly income."
+        )
     elif purchase_income_ratio > 0.5:
         risk_adjustment += 0.15
+        explanations.append("Purchase amount is high compared to monthly income.")
     elif purchase_income_ratio > 0.3:
         risk_adjustment += 0.08
+        explanations.append("Purchase amount is moderately high compared to monthly income.")
 
     if installment_income_ratio > 0.5:
         risk_adjustment += 0.20
+        explanations.append("Installment amount consumes more than 50% of monthly income.")
     elif installment_income_ratio > 0.3:
         risk_adjustment += 0.10
+        explanations.append("Installment amount consumes more than 30% of monthly income.")
 
     if credit_score < 500:
         risk_adjustment += 0.20
+        explanations.append("Very low credit score increased default risk.")
     elif credit_score < 650:
         risk_adjustment += 0.10
+        explanations.append("Below-average credit score slightly increased default risk.")
 
     if missed_payments > 0:
-        risk_adjustment += min(missed_payments * 0.10, 0.30)
+        missed_payment_adjustment = min(missed_payments * 0.10, 0.30)
+        risk_adjustment += missed_payment_adjustment
+        explanations.append(
+            f"{missed_payments} missed payment(s) increased default risk."
+        )
 
     if repayment_delay_days > 30:
         risk_adjustment += 0.25
+        explanations.append("Repayment delay above 30 days significantly increased risk.")
     elif repayment_delay_days > 7:
         risk_adjustment += 0.15
+        explanations.append("Repayment delay above 7 days increased risk.")
     elif repayment_delay_days > 0:
         risk_adjustment += 0.08
+        explanations.append("Minor repayment delay slightly increased risk.")
 
-    probability = min(probability + risk_adjustment, 0.99)
+    probability = min(base_probability + risk_adjustment, 0.99)
+
+    if len(explanations) == 0:
+        explanations.append("No additional business-rule adjustments were applied.")
 
     if probability < 0.30:
         risk_label = "Low Risk"
@@ -558,17 +582,49 @@ if page in ["Dashboard", "Prediction", "Explainable AI"]:
         risk_class = "risk-high"
         recommendation = "Customer has high default risk. Consider rejecting or lowering credit limit."
 
+    explanation_html = "".join(
+    [f"<li>{exp}</li>" for exp in explanations]
+    )
+
     with middle:
         st.markdown(
             f"""
             <div class="result-card">
                 <p><b>Default Probability</b></p>
-                <h1 style="text-align:center; color:#2563EB; font-size:52px;">{probability * 100:.2f}%</h1>
+
+                <h1 style="text-align:center; color:#2563EB; font-size:52px;">
+                    {probability * 100:.2f}%
+                </h1>
+
+                <p style="text-align:center; color:#64748B;">
+                    Base model probability: {base_probability * 100:.2f}%<br>
+                    Business-rule adjustment: +{risk_adjustment * 100:.2f}%
+                </p>
+
                 <p><b>Risk Level</b></p>
-                <div class="{risk_class}">{risk_label}</div>
+
+                <div class="{risk_class}">
+                    {risk_label}
+                </div>
+
                 <br>
+
                 <p><b>Recommendation</b></p>
-                <div class="recommend-box">{recommendation}</div>
+
+                <div class="recommend-box">
+                    {recommendation}
+                </div>
+
+                <br>
+
+                <p><b>Adjustment Explanation</b></p>
+
+                <div class="recommend-box">
+                    <ul style="margin-bottom:0;">
+                        {explanation_html}
+                    </ul>
+                </div>
+
             </div>
             """,
             unsafe_allow_html=True
