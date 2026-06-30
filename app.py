@@ -175,7 +175,7 @@ label {
     font-size: 14px !important;
 }
 
-input,
+input:not([aria-autocomplete]),
 div[data-baseweb="select"] > div {
     background-color: #FFFFFF !important;
     color: #071D49 !important;
@@ -188,6 +188,17 @@ div[data-baseweb="select"] span {
     color: #071D49 !important;
 }
 
+div[data-baseweb="select"] input {
+    display: none !important;
+}
+
+div[data-baseweb="select"] > div {
+    cursor: pointer !important;
+}
+
+div[data-baseweb="select"] div {
+    box-shadow: none !important;
+}
 details {
     background: #F8FAFC !important;
     border: 1px solid #D6E4F5 !important;
