@@ -610,18 +610,18 @@ if page in ["Dashboard", "Prediction", "Explainable AI"]:
     
     # FINAL probability and risk label
     probability = min(base_probability + risk_adjustment, 0.99) 
-        if probability < 0.30:
-            risk_label = "Low Risk"
-            risk_class = "risk-low"
-            recommendation = "Customer is likely safe for BNPL approval."
-        elif probability < 0.60:
-            risk_label = "Medium Risk"
-            risk_class = "risk-medium"
-            recommendation = "Customer requires additional review before approval."
-        else:
-            risk_label = "High Risk"
-            risk_class = "risk-high"
-            recommendation = "Customer has high default risk. Consider rejecting or lowering credit limit."
+    if probability < 0.30:
+        risk_label = "Low Risk"
+        risk_class = "risk-low"
+        recommendation = "Customer is likely safe for BNPL approval."
+    elif probability < 0.60:
+        risk_label = "Medium Risk"
+        risk_class = "risk-medium"
+        recommendation = "Customer requires additional review before approval."
+    else:
+        risk_label = "High Risk"
+        risk_class = "risk-high"
+        recommendation = "Customer has high default risk. Consider rejecting or lowering credit limit."
         
     
     with middle:
