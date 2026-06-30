@@ -504,6 +504,47 @@ if page in ["Dashboard", "Prediction", "Explainable AI"]:
 
     probability = predict_probability(model, input_data)
 
+    # -----------------------------
+    # Business rule adjustments
+    # -----------------------------
+    purchase_income_ratio = purchase_amount / max(monthly_income, 1)
+    installment_amount = purchase_amount / max(bnpl_installments, 1)
+    installment_income_ratio = installment_amount / max(monthly_income, 1)
+
+    risk_adjustment = 0
+
+    if monthly_income < 500:
+        risk_adjustment += 0.25
+
+    if purchase_income_ratio > 1:
+        risk_adjustment += 0.25
+    elif purchase_income_ratio > 0.5:
+        risk_adjustment += 0.15
+    elif purchase_income_ratio > 0.3:
+        risk_adjustment += 0.08
+
+    if installment_income_ratio > 0.5:
+        risk_adjustment += 0.20
+    elif installment_income_ratio > 0.3:
+        risk_adjustment += 0.10
+
+    if credit_score < 500:
+        risk_adjustment += 0.20
+    elif credit_score < 650:
+        risk_adjustment += 0.10
+
+    if missed_payments > 0:
+        risk_adjustment += min(missed_payments * 0.10, 0.30)
+
+    if repayment_delay_days > 30:
+        risk_adjustment += 0.25
+    elif repayment_delay_days > 7:
+        risk_adjustment += 0.15
+    elif repayment_delay_days > 0:
+        risk_adjustment += 0.08
+
+    probability = min(probability + risk_adjustment, 0.99)
+
     if probability < 0.30:
         risk_label = "Low Risk"
         risk_class = "risk-low"
