@@ -592,13 +592,25 @@ if page in ["Dashboard", "Prediction", "Explainable AI"]:
         risk_adjustment += 0.10
         explanations.append("Customer segment is marked as Medium Risk.")
 
-    if product_category == "Electronics":
-        risk_adjustment += 0.05
-        explanations.append("Electronics purchases slightly increased default risk.")
-    elif product_category == "Beauty":
-        risk_adjustment += 0.03
-        explanations.append("Beauty purchases slightly increased default risk.")
+    # Product category business rules
 
+    if product_category == "Electronics" and purchase_amount >= 1000:
+        risk_adjustment += 0.05
+        explanations.append(
+            "High-value electronics purchase slightly increased default risk."
+        )
+
+    elif product_category == "Home" and purchase_amount >= 800:
+        risk_adjustment += 0.03
+        explanations.append(
+            "High-value home product purchase slightly increased default risk."
+        )
+
+    else:
+        explanations.append(
+            f"Product category ({product_category}) did not trigger any additional business-rule adjustment."
+        )
+    
     if location in ["India"]:
         risk_adjustment += 0.03
         explanations.append("Location-based risk adjustment was applied.")
