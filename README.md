@@ -211,13 +211,7 @@ streamlit run app.py
 
 # Dashboard Preview
 
-![Dashboard] (dashboard.png)
-
-Example:
-
-```bash
-images/dashboard_preview.png
-```
+![Dashboard](dashboard.png)
 
 ---
 
