@@ -607,9 +607,23 @@ if page in ["Dashboard", "Prediction", "Explainable AI"]:
     if transaction_date.month in [11, 12]:
         risk_adjustment += 0.03
         explanations.append("End-of-year transaction period slightly increased risk.")
-
-    explanation_html = "".join([f"<li>{exp}</li>" for exp in explanations])
-
+    
+    # FINAL probability and risk label
+    probability = min(base_probability + risk_adjustment, 0.99) 
+        if probability < 0.30:
+            risk_label = "Low Risk"
+            risk_class = "risk-low"
+            recommendation = "Customer is likely safe for BNPL approval."
+        elif probability < 0.60:
+            risk_label = "Medium Risk"
+            risk_class = "risk-medium"
+            recommendation = "Customer requires additional review before approval."
+        else:
+            risk_label = "High Risk"
+            risk_class = "risk-high"
+            recommendation = "Customer has high default risk. Consider rejecting or lowering credit limit."
+        
+    
     with middle:
         with st.container(border=True):
 
@@ -652,19 +666,7 @@ if page in ["Dashboard", "Prediction", "Explainable AI"]:
                 unsafe_allow_html=True,
             )
             
-        probability = min(base_probability + risk_adjustment, 0.99) 
-        if probability < 0.30:
-            risk_label = "Low Risk"
-            risk_class = "risk-low"
-            recommendation = "Customer is likely safe for BNPL approval."
-        elif probability < 0.60:
-            risk_label = "Medium Risk"
-            risk_class = "risk-medium"
-            recommendation = "Customer requires additional review before approval."
-        else:
-            risk_label = "High Risk"
-            risk_class = "risk-high"
-            recommendation = "Customer has high default risk. Consider rejecting or lowering credit limit."
+        
 # =========================================================
 # ANALYTICS PAGE
 # =========================================================
