@@ -189,7 +189,9 @@ div[data-baseweb="select"] span {
 }
 
 div[data-baseweb="select"] input {
-    display: none !important;
+    opacity: 0 !important;
+    width: 1px !important;
+    min-width: 1px !important;
 }
 
 div[data-baseweb="select"] > div {
@@ -199,6 +201,7 @@ div[data-baseweb="select"] > div {
 div[data-baseweb="select"] div {
     box-shadow: none !important;
 }
+
 details {
     background: #F8FAFC !important;
     border: 1px solid #D6E4F5 !important;
