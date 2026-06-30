@@ -211,7 +211,7 @@ streamlit run app.py
 
 # Dashboard Preview
 
-Add screenshots of your dashboard here.
+![Dashboard] (dashboard.png)
 
 Example:
 
